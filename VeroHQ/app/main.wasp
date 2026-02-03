@@ -1,0 +1,482 @@
+app VeroHQ {
+  wasp: {
+    version: "^0.20.0"
+  },
+
+  title: "VeroHQ - Release Management Made Simple",
+
+  head: [
+    "<link rel='icon' href='/favicon.ico' />",
+    "<meta charset='utf-8' />",
+    "<meta name='description' content='VeroHQ helps engineering teams plan, track, and ship releases with confidence. Get real-time insights, automate workflows, and achieve 95% on-time delivery.' />",
+    "<meta name='author' content='VeroHQ' />",
+    "<meta name='keywords' content='release management, software deployment, devops tools, project management, engineering teams, CI/CD automation' />",
+
+    "<meta property='og:type' content='website' />",
+    "<meta property='og:title' content='VeroHQ - Release Management Made Simple' />",
+    "<meta property='og:site_name' content='VeroHQ' />",
+    "<meta property='og:url' content='https://verohq.ai' />",
+    "<meta property='og:description' content='Plan, track, and ship releases with confidence. Real-time insights and automated workflows for engineering teams.' />",
+    "<meta property='og:image' content='https://verohq.ai/og-image.jpg' />",
+    "<meta name='twitter:image' content='https://verohq.ai/og-image.jpg' />",
+    "<meta name='twitter:image:width' content='1200' />",
+    "<meta name='twitter:image:height' content='630' />",
+    "<meta name='twitter:card' content='summary_large_image' />",
+    // Google Tag Manager
+    "<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start': new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0], j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src='https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','GTM-TFHR33VC');</script>",
+    // Google Analytics will be added dynamically via Cookie Consent
+    "<script defer data-domain='verohq.ai' src='https://plausible.io/js/script.js'></script>",  // for production
+  ],
+
+  // 🔐 Auth out of the box! https://wasp.sh/docs/auth/overview
+  auth: {
+    userEntity: User,
+    methods: {
+      // NOTE: If you decide to not use email auth, make sure to also delete the related routes and pages below.
+      //   (RequestPasswordReset(Route|Page), PasswordReset(Route|Page), EmailVerification(Route|Page))
+      email: {
+        fromField: {
+          name: "VeroHQ",
+          email: "noreply@verohq.ai"
+        },
+        emailVerification: {
+          clientRoute: EmailVerificationRoute,
+          getEmailContentFn: import { getVerificationEmailContent } from "@src/auth/email-and-pass/emails",
+        },
+        passwordReset: {
+          clientRoute: PasswordResetRoute,
+          getEmailContentFn: import { getPasswordResetEmailContent } from "@src/auth/email-and-pass/emails",
+        },
+        userSignupFields: import { getEmailUserFields } from "@src/auth/userSignupFields",
+      },
+      // Uncomment to enable Google Auth (check https://wasp.sh/docs/auth/social-auth/google for setup instructions):
+      // google: { // Guide for setting up Auth via Google
+      //   userSignupFields: import { getGoogleUserFields } from "@src/auth/userSignupFields",
+      //   configFn: import { getGoogleAuthConfig } from "@src/auth/userSignupFields",
+      // },
+      // Uncomment to enable GitHub Auth (check https://wasp.sh/docs/auth/social-auth/github for setup instructions):
+      // gitHub: {
+      //   userSignupFields: import { getGitHubUserFields } from "@src/auth/userSignupFields",
+      //   configFn: import { getGitHubAuthConfig } from "@src/auth/userSignupFields",
+      // },
+      // Uncomment to enable Discord Auth (check https://wasp.sh/docs/auth/social-auth/discord for setup instructions):
+      // discord: {
+      //   userSignupFields: import { getDiscordUserFields } from "@src/auth/userSignupFields",
+      //   configFn: import { getDiscordAuthConfig } from "@src/auth/userSignupFields"
+      // }
+    },
+    onAuthFailedRedirectTo: "/login",
+    onAuthSucceededRedirectTo: "/dashboard",
+  },
+
+  db: {
+    // Run `wasp db seed` to seed the database with the seed functions below:
+    seeds: [
+      // Populates the database with a bunch of fake users to work with during development.
+      import { seedMockUsers } from "@src/server/scripts/dbSeeds",
+    ]
+  },
+
+  client: {
+    rootComponent: import App from "@src/client/App",
+  },
+
+  emailSender: {
+    // NOTE: "Dummy" provider is just for local development purposes.
+    //   Make sure to check the server logs for the email confirmation url (it will not be sent to an address)!
+    //   Once you are ready for production, switch to e.g. "SendGrid" or "Mailgun" providers.
+    provider: Dummy,
+    defaultFrom: {
+      name: "VeroHQ",
+      // When using a real provider, e.g. SendGrid, you must use the same email address that you configured your account to send out emails with!
+      email: "noreply@verohq.ai"
+    },
+  },
+}
+
+route LandingPageRoute { path: "/", to: LandingPage }
+page LandingPage {
+  component: import LandingPage from "@src/landing-page/LandingPage"
+}
+
+//#region Auth Pages
+route LoginRoute { path: "/login", to: LoginPage }
+page LoginPage {
+  component: import Login from "@src/auth/LoginPage"
+}
+
+route SignupRoute { path: "/signup", to: SignupPage }
+page SignupPage {
+  component: import { Signup } from "@src/auth/SignupPage"
+}
+
+route RequestPasswordResetRoute { path: "/request-password-reset", to: RequestPasswordResetPage }
+page RequestPasswordResetPage {
+  component: import { RequestPasswordResetPage } from "@src/auth/email-and-pass/RequestPasswordResetPage",
+}
+
+route PasswordResetRoute { path: "/password-reset", to: PasswordResetPage }
+page PasswordResetPage {
+  component: import { PasswordResetPage } from "@src/auth/email-and-pass/PasswordResetPage",
+}
+
+route EmailVerificationRoute { path: "/email-verification", to: EmailVerificationPage }
+page EmailVerificationPage {
+  component: import { EmailVerificationPage } from "@src/auth/email-and-pass/EmailVerificationPage",
+}
+//#endregion
+
+//#region User
+route AccountRoute { path: "/account", to: AccountPage }
+page AccountPage {
+  authRequired: true,
+  component: import Account from "@src/user/AccountPage"
+}
+
+query getPaginatedUsers {
+  fn: import { getPaginatedUsers } from "@src/user/operations",
+  entities: [User]
+}
+
+action updateIsUserAdminById {
+  fn: import { updateIsUserAdminById } from "@src/user/operations",
+  entities: [User]
+}
+//#endregion
+
+//#region Dashboard
+route DashboardRoute { path: "/dashboard", to: DashboardPage }
+page DashboardPage {
+  authRequired: true,
+  component: import Dashboard from "@src/dashboard/DashboardPage"
+}
+
+// Keep demo app for backwards compatibility
+route DemoAppRoute { path: "/demo-app", to: DemoAppPage }
+page DemoAppPage {
+  authRequired: true,
+  component: import DemoAppPage from "@src/demo-ai-app/DemoAppPage"
+}
+
+action generateGptResponse {
+  fn: import { generateGptResponse } from "@src/demo-ai-app/operations",
+  entities: [User, Task, GptResponse]
+}
+
+action createTask {
+  fn: import { createTask } from "@src/demo-ai-app/operations",
+  entities: [Task]
+}
+
+action deleteTask {
+  fn: import { deleteTask } from "@src/demo-ai-app/operations",
+  entities: [Task]
+}
+
+action updateTask {
+  fn: import { updateTask } from "@src/demo-ai-app/operations",
+  entities: [Task]
+}
+
+query getGptResponses {
+  fn: import { getGptResponses } from "@src/demo-ai-app/operations",
+  entities: [User, GptResponse]
+}
+
+query getAllTasksByUser {
+  fn: import { getAllTasksByUser } from "@src/demo-ai-app/operations",
+  entities: [Task]
+}
+//#endregion
+
+//#region Payment
+route PricingPageRoute { path: "/pricing", to: PricingPage }
+page PricingPage {
+  component: import PricingPage from "@src/payment/PricingPage"
+}
+
+route CheckoutResultRoute { path: "/checkout", to: CheckoutResultPage }
+page CheckoutResultPage {
+  authRequired: true,
+  component: import CheckoutResultPage from "@src/payment/CheckoutResultPage"
+}
+
+query getCustomerPortalUrl {
+  fn: import { getCustomerPortalUrl } from  "@src/payment/operations",
+  entities: [User]
+}
+
+action generateCheckoutSession {
+  fn: import { generateCheckoutSession } from "@src/payment/operations",
+  entities: [User]
+}
+
+api paymentsWebhook {
+  fn: import { paymentsWebhook } from "@src/payment/webhook",
+  entities: [User],
+  middlewareConfigFn: import { paymentsMiddlewareConfigFn } from "@src/payment/webhook",
+  httpRoute: (POST, "/payments-webhook")
+}
+//#endregion
+
+//#region File Upload
+route FileUploadRoute { path: "/file-upload", to: FileUploadPage }
+page FileUploadPage {
+  authRequired: true,
+  component: import FileUpload from "@src/file-upload/FileUploadPage"
+}
+
+action createFileUploadUrl {
+  fn: import { createFileUploadUrl } from "@src/file-upload/operations",
+  entities: [User, File]
+}
+
+action addFileToDb {
+  fn: import { addFileToDb } from "@src/file-upload/operations",
+  entities: [User, File]
+}
+
+query getAllFilesByUser {
+  fn: import { getAllFilesByUser } from "@src/file-upload/operations",
+  entities: [User, File]
+}
+
+query getDownloadFileSignedURL {
+  fn: import { getDownloadFileSignedURL } from "@src/file-upload/operations",
+  entities: [User, File]
+}
+
+action deleteFile {
+  fn: import { deleteFile } from "@src/file-upload/operations",
+  entities: [User, File]
+}
+//#endregion
+
+//#region Analytics
+query getDailyStats {
+  fn: import { getDailyStats } from "@src/analytics/operations",
+  entities: [User, DailyStats]
+}
+
+job dailyStatsJob {
+  executor: PgBoss,
+  perform: {
+    fn: import { calculateDailyStats } from "@src/analytics/stats"
+  },
+  schedule: {
+    cron: "0 * * * *" // every hour. useful in production
+    // cron: "* * * * *" // every minute. useful for debugging
+  },
+  entities: [User, DailyStats, Logs, PageViewSource]
+}
+//#endregion
+
+//#region Admin Dashboard
+route AdminRoute { path: "/admin", to: AnalyticsDashboardPage }
+page AnalyticsDashboardPage {
+  authRequired: true,
+  component: import AnalyticsDashboardPage from "@src/admin/dashboards/analytics/AnalyticsDashboardPage"
+}
+
+route AdminUsersRoute { path: "/admin/users", to: AdminUsersPage }
+page AdminUsersPage {
+  authRequired: true,
+  component: import AdminUsers from "@src/admin/dashboards/users/UsersDashboardPage"
+}
+
+route AdminSettingsRoute { path: "/admin/settings", to: AdminSettingsPage }
+page AdminSettingsPage {
+  authRequired: true,
+  component: import AdminSettings from "@src/admin/elements/settings/SettingsPage"
+}
+
+route AdminCalendarRoute { path: "/admin/calendar", to: AdminCalendarPage }
+page AdminCalendarPage {
+  authRequired: true,
+  component: import AdminCalendar from "@src/admin/elements/calendar/CalendarPage"
+}
+
+
+route AdminUIButtonsRoute { path: "/admin/ui/buttons", to: AdminUIButtonsPage }
+page AdminUIButtonsPage {
+  authRequired: true,
+  component: import AdminUI from "@src/admin/elements/ui-elements/ButtonsPage"
+}
+
+route NotFoundRoute { path: "*", to: NotFoundPage }
+page NotFoundPage {
+  component: import { NotFoundPage } from "@src/client/components/NotFoundPage"
+}
+//#endregion
+
+//#region Contact Form Messages
+route AdminMessagesRoute { path: "/admin/messages", to: AdminMessagesPage }
+page AdminMessagesPage {
+  authRequired: true,
+  component: import AdminMessages from "@src/admin/dashboards/messages/MessagesPage"
+}
+//#endregion
+
+//#region Blog Routes
+route BlogHomeRoute { path: "/blog", to: BlogHomePage }
+page BlogHomePage {
+  component: import BlogHome from "@src/blog/BlogHomePage"
+}
+
+route BlogPostRoute { path: "/blog/:slug", to: BlogPostPage }
+page BlogPostPage {
+  component: import BlogPost from "@src/blog/BlogPostPage"
+}
+
+route BlogCategoryRoute { path: "/blog/category/:category", to: BlogCategoryPage }
+page BlogCategoryPage {
+  component: import BlogCategory from "@src/blog/BlogCategoryPage"
+}
+//#endregion
+
+//#region Additional Marketing Pages
+route FeaturesRoute { path: "/features", to: FeaturesPage }
+page FeaturesPage {
+  component: import Features from "@src/marketing/FeaturesPage"
+}
+
+route AboutRoute { path: "/about", to: AboutPage }
+page AboutPage {
+  component: import About from "@src/marketing/AboutPage"
+}
+
+route ContactRoute { path: "/contact", to: ContactPage }
+page ContactPage {
+  component: import Contact from "@src/marketing/ContactPage"
+}
+
+route DemoRoute { path: "/demo", to: DemoPage }
+page DemoPage {
+  component: import Demo from "@src/marketing/DemoPage"
+}
+
+route ReleaseManagementRoute { path: "/features/release-management", to: ReleaseManagementPage }
+page ReleaseManagementPage {
+  component: import ReleaseManagement from "@src/marketing/ReleaseManagementPage"
+}
+
+route TaskManagementRoute { path: "/features/task-management", to: TaskManagementPage }
+page TaskManagementPage {
+  component: import TaskManagement from "@src/marketing/TaskManagementPage"
+}
+
+route QATestingRoute { path: "/features/qa-testing", to: QATestingPage }
+page QATestingPage {
+  component: import QATesting from "@src/marketing/QATestingPage"
+}
+
+route AIAutomationRoute { path: "/features/ai-automation", to: AIAutomationPage }
+page AIAutomationPage {
+  component: import AIAutomation from "@src/marketing/AIAutomationPage"
+}
+
+route EngineeringTeamsRoute { path: "/solutions/engineering", to: EngineeringTeamsPage }
+page EngineeringTeamsPage {
+  component: import EngineeringTeams from "@src/marketing/EngineeringTeamsPage"
+}
+
+route ProductTeamsRoute { path: "/solutions/product", to: ProductTeamsPage }
+page ProductTeamsPage {
+  component: import ProductTeams from "@src/marketing/ProductTeamsPage"
+}
+
+route IntegrationsRoute { path: "/integrations", to: IntegrationsPage }
+page IntegrationsPage {
+  component: import Integrations from "@src/marketing/IntegrationsPage"
+}
+//#endregion
+
+//#region Blog API - Public
+api getPosts {
+  fn: import { getPosts } from "@src/blog/operations",
+  httpRoute: (GET, "/api/posts")
+}
+
+api getPostBySlug {
+  fn: import { getPostBySlug } from "@src/blog/operations",
+  httpRoute: (GET, "/api/posts/:slug")
+}
+
+api getCategories {
+  fn: import { getCategories } from "@src/blog/operations",
+  httpRoute: (GET, "/api/categories")
+}
+
+api getTags {
+  fn: import { getTags } from "@src/blog/operations",
+  httpRoute: (GET, "/api/tags")
+}
+
+api incrementPostView {
+  fn: import { incrementPostView } from "@src/blog/operations",
+  httpRoute: (POST, "/api/posts/:id/view")
+}
+//#endregion
+
+//#region Blog API - Admin
+api createPost {
+  fn: import { createPost } from "@src/blog/admin-operations",
+  httpRoute: (POST, "/api/admin/posts"),
+  auth: true
+}
+
+api updatePost {
+  fn: import { updatePost } from "@src/blog/admin-operations",
+  httpRoute: (PUT, "/api/admin/posts/:id"),
+  auth: true
+}
+
+api deletePost {
+  fn: import { deletePost } from "@src/blog/admin-operations",
+  httpRoute: (DELETE, "/api/admin/posts/:id"),
+  auth: true
+}
+
+api publishPost {
+  fn: import { publishPost } from "@src/blog/admin-operations",
+  httpRoute: (PUT, "/api/admin/posts/:id/publish"),
+  auth: true
+}
+
+api schedulePost {
+  fn: import { schedulePost } from "@src/blog/admin-operations",
+  httpRoute: (PUT, "/api/admin/posts/:id/schedule"),
+  auth: true
+}
+
+api getDrafts {
+  fn: import { getDrafts } from "@src/blog/admin-operations",
+  httpRoute: (GET, "/api/admin/posts/drafts"),
+  auth: true
+}
+//#endregion
+
+//#region Analytics API
+api trackEvent {
+  fn: import { trackEvent } from "@src/analytics/tracking",
+  httpRoute: (POST, "/api/analytics/event")
+}
+
+api trackPageView {
+  fn: import { trackPageView } from "@src/analytics/tracking",
+  httpRoute: (POST, "/api/analytics/pageview")
+}
+//#endregion
+
+//#region Background Jobs
+job publishScheduledPosts {
+  executor: PgBoss,
+  perform: {
+    fn: import { publishScheduledPosts } from "@src/blog/jobs"
+  },
+  schedule: {
+    cron: "*/5 * * * *" // Every 5 minutes
+  },
+  entities: [Post]
+}
+//#endregion
