@@ -127,17 +127,22 @@ export default function Features() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       {/* Hero */}
-      <div className="mx-auto max-w-7xl px-6 py-24 text-center lg:px-8">
-        <p className="text-primary mb-4 text-sm font-semibold uppercase tracking-wide">
-          Features
-        </p>
-        <h1 className="text-4xl font-bold sm:text-5xl">
-          Built for how engineering teams actually ship
-        </h1>
-        <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg">
-          VeroHQ covers every stage of your release lifecycle — from planning
-          through deployment. No gaps, no manual tracking, no surprises.
-        </p>
+      <div className="relative overflow-hidden pt-14">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="absolute right-0 top-0 -z-10 w-96 h-96 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-3xl" />
+
+        <div className="mx-auto max-w-7xl px-6 py-24 text-center lg:px-8">
+          <p className="text-primary mb-4 text-sm font-semibold uppercase tracking-widest">
+            Features
+          </p>
+          <h1 className="text-4xl font-bold sm:text-5xl bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent">
+            Built for how engineering teams actually ship
+          </h1>
+          <p className="text-muted-foreground mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
+            VeroHQ covers every stage of your release lifecycle — from planning
+            through deployment. No gaps, no manual tracking, no surprises.
+          </p>
+        </div>
       </div>
 
       {/* Feature Sections */}

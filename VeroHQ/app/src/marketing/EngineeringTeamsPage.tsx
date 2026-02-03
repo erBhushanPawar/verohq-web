@@ -19,29 +19,35 @@ export default function EngineeringTeamsPage() {
     <div className="bg-background text-foreground">
       <main className="isolate">
         {/* Hero */}
-        <div className="mx-auto max-w-7xl px-6 py-24 text-center lg:px-8">
-          <h1 className="text-4xl font-bold sm:text-5xl">
-            Built for Engineering Teams Who Ship
-          </h1>
-          <p className="text-muted-foreground mx-auto mt-6 max-w-3xl text-lg">
-            Stop wrestling with disconnected tools. VeroHQ gives engineering teams a unified platform for planning, building, and deploying great software.
-          </p>
-          <div className="mt-8 flex items-center justify-center gap-x-6">
-            <Button size="lg" variant="default" asChild>
-              <WaspRouterLink to={routes.SignupRoute.to}>
-                Start Free Trial <ArrowRight className="ml-2 h-4 w-4" />
-              </WaspRouterLink>
-            </Button>
-            <Button size="lg" variant="outline" asChild>
-              <WaspRouterLink to={routes.PricingPageRoute.to}>
-                View Pricing
-              </WaspRouterLink>
-            </Button>
+        <div className="relative overflow-hidden pt-14">
+          <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
+          <div className="absolute right-0 top-0 -z-10 w-96 h-96 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-3xl" />
+
+          <div className="mx-auto max-w-7xl px-6 py-24 text-center lg:px-8">
+            <h1 className="text-4xl font-bold sm:text-5xl bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent">
+              Built for Engineering Teams Who Ship
+            </h1>
+            <p className="text-muted-foreground mx-auto mt-6 max-w-3xl text-lg leading-relaxed">
+              Stop wrestling with disconnected tools. VeroHQ gives engineering teams a unified platform for planning, building, and deploying great software.
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 sm:gap-6">
+              <Button size="lg" variant="default" asChild className="group hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
+                <WaspRouterLink to={routes.SignupRoute.to}>
+                  Start Free Trial <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                </WaspRouterLink>
+              </Button>
+              <Button size="lg" variant="outline" asChild className="hover:bg-primary/10 hover:text-primary transition-all duration-300">
+                <WaspRouterLink to={routes.PricingPageRoute.to}>
+                  View Pricing
+                </WaspRouterLink>
+              </Button>
+            </div>
           </div>
         </div>
 
         {/* Pain Points */}
-        <div className="bg-muted/50 py-24">
+        <div className="relative overflow-hidden py-24">
+          <div className="absolute inset-0 bg-gradient-to-b from-accent/5 via-background to-background -z-10" />
           <div className="mx-auto max-w-3xl px-6">
             <h2 className="text-foreground text-center text-3xl font-bold mb-12">
               Sound Familiar?

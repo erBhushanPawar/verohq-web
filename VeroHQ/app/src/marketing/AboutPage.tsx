@@ -36,19 +36,24 @@ export default function About() {
   return (
     <div className="bg-background text-foreground min-h-screen">
       {/* Hero */}
-      <div className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-primary mb-4 text-sm font-semibold uppercase tracking-wide">
-            About VeroHQ
-          </p>
-          <h1 className="text-4xl font-bold sm:text-5xl">
-            Release management shouldn't be the hardest part of shipping software
-          </h1>
-          <p className="text-muted-foreground mt-6 text-lg leading-8">
-            We started VeroHQ because we lived the problem. Missed deadlines,
-            scattered status updates, releases that slipped because nobody had
-            the full picture. We built the tool we wished existed.
-          </p>
+      <div className="relative overflow-hidden pt-14">
+        <div className="absolute inset-0 -z-10 bg-gradient-to-b from-primary/5 via-background to-background" />
+        <div className="absolute right-0 top-0 -z-10 w-96 h-96 bg-gradient-to-bl from-primary/20 to-transparent rounded-full blur-3xl" />
+
+        <div className="mx-auto max-w-7xl px-6 py-24 lg:px-8">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-primary mb-4 text-sm font-semibold uppercase tracking-widest">
+              About VeroHQ
+            </p>
+            <h1 className="text-4xl font-bold sm:text-5xl bg-gradient-to-r from-foreground via-foreground to-foreground/80 bg-clip-text text-transparent">
+              Release management shouldn't be the hardest part of shipping software
+            </h1>
+            <p className="text-muted-foreground mt-6 text-lg leading-relaxed">
+              We started VeroHQ because we lived the problem. Missed deadlines,
+              scattered status updates, releases that slipped because nobody had
+              the full picture. We built the tool we wished existed.
+            </p>
+          </div>
         </div>
       </div>
 
